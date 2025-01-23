@@ -1,16 +1,27 @@
 package main
 
 import (
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"io"
 	"miniCloudStroage/iserver"
 	"net/http"
 )
 
+type DirRequest struct {
+	filePath string
+	addPath  string
+	delPath  string
+}
+
 func main() {
 	router := gin.Default()
 
-	server := iserver.NewSimpleFileServer("/home/sti/tmp")
+	// linux下
+	// server := iserver.NewSimpleFileServer("/home/sti/tmp")
+
+	// windows下
+	server := iserver.NewSimpleFileServer("D:\\cloudStorage")
 
 	router.POST("/upload", func(c *gin.Context) {
 		fileHeader, err := c.FormFile("file")
@@ -59,6 +70,85 @@ func main() {
 			return
 		}
 
+	})
+
+	router.POST("/list_dirs", func(c *gin.Context) {
+		raw, err := c.GetRawData()
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error_info": "read body fail"})
+			return
+		}
+
+		var dirRequest DirRequest
+		if err := json.Unmarshal(raw, &dirRequest); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error_info": "json parse fail"})
+			return
+		}
+
+		dirs := server.ListDirs(dirRequest.filePath)
+
+		c.JSON(http.StatusOK, gin.H{"data": dirs})
+		return
+	})
+
+	router.POST("/add_dir", func(c *gin.Context) {
+		raw, err := c.GetRawData()
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error_info": "read body error",
+			})
+			return
+		}
+
+		var dirRequest DirRequest
+		if err := json.Unmarshal(raw, &dirRequest); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error_info": "json parse fail",
+			})
+			return
+		}
+
+		err = server.AddDir(dirRequest.addPath)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error_info": "add dir error",
+			})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"msg": "success",
+		})
+		return
+	})
+
+	router.POST("/del_dir", func(c *gin.Context) {
+		raw, err := c.GetRawData()
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error_info": "read body error",
+			})
+			return
+		}
+
+		var dirRequest DirRequest
+		if err := json.Unmarshal(raw, &dirRequest); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error_info": "json parse fail",
+			})
+			return
+		}
+
+		err = server.DelDir(dirRequest.delPath)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error_info": "add dir error",
+			})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"msg": "success",
+		})
+		return
 	})
 
 	err := router.Run(":8080")

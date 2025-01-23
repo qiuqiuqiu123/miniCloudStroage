@@ -75,7 +75,7 @@ func (s *SimpleFileServer) Download(path string) ([]byte, error) {
 	return data, nil
 }
 
-func (s *SimpleFileServer) listDirs(path string) []string {
+func (s *SimpleFileServer) ListDirs(path string) []string {
 	curPath := s.rootPath
 	if path != "" {
 		curPath = filepath.Join(curPath, path)
@@ -97,6 +97,34 @@ func (s *SimpleFileServer) listDirs(path string) []string {
 	return dirNames
 }
 
-func (s *SimpleFileServer) addDir(path string) {
+func (s *SimpleFileServer) AddDir(path string) error {
+	curPath := filepath.Join(s.rootPath, path)
 
+	// 如果文件夹不存在，则进行创建
+	if _, err := os.Stat(curPath); os.IsNotExist(err) {
+		_, err := os.Create(curPath)
+		if err != nil {
+			fmt.Println("create dir fail")
+			return err
+		}
+	}
+
+	// 在就不进行处理
+	return nil
+}
+
+func (s *SimpleFileServer) DelDir(path string) error {
+	curPath := filepath.Join(s.rootPath, path)
+
+	// 如果文件夹不在,不进行处理
+	if _, err := os.Stat(curPath); os.IsNotExist(err) {
+		return err
+	}
+
+	err := os.Remove(curPath)
+	if err != nil {
+		fmt.Println("del dir fail")
+		return err
+	}
+	return nil
 }

@@ -1,9 +1,9 @@
 package iface
 
 type IFileDirService interface {
-	listDirs(root string) []string
+	ListDirs(root string) []string
 
-	addDir(curPath string) error
+	AddDir(curPath string) error
 
-	delDir(delPath string) error
+	DelDir(delPath string) error
 }
