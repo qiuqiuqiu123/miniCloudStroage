@@ -9,9 +9,9 @@ import (
 )
 
 type DirRequest struct {
-	filePath string
-	addPath  string
-	delPath  string
+	FilePath string `json:"filePath"`
+	AddPath  string
+	DelPath  string
 }
 
 func main() {
@@ -85,7 +85,7 @@ func main() {
 			return
 		}
 
-		dirs := server.ListDirs(dirRequest.filePath)
+		dirs := server.ListDirs(dirRequest.FilePath)
 
 		c.JSON(http.StatusOK, gin.H{"data": dirs})
 		return
@@ -108,7 +108,7 @@ func main() {
 			return
 		}
 
-		err = server.AddDir(dirRequest.addPath)
+		err = server.AddDir(dirRequest.AddPath)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error_info": "add dir error",
@@ -138,10 +138,10 @@ func main() {
 			return
 		}
 
-		err = server.DelDir(dirRequest.delPath)
+		err = server.DelDir(dirRequest.DelPath)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
-				"error_info": "add dir error",
+				"error_info": "del dir error",
 			})
 			return
 		}

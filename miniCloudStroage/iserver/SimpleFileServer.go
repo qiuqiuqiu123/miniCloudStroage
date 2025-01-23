@@ -3,6 +3,7 @@ package iserver
 import (
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 )
@@ -100,9 +101,10 @@ func (s *SimpleFileServer) ListDirs(path string) []string {
 func (s *SimpleFileServer) AddDir(path string) error {
 	curPath := filepath.Join(s.rootPath, path)
 
+	fmt.Println("cur path :", curPath)
 	// 如果文件夹不存在，则进行创建
 	if _, err := os.Stat(curPath); os.IsNotExist(err) {
-		_, err := os.Create(curPath)
+		err := os.Mkdir(curPath, fs.ModeDir)
 		if err != nil {
 			fmt.Println("create dir fail")
 			return err
@@ -116,9 +118,10 @@ func (s *SimpleFileServer) AddDir(path string) error {
 func (s *SimpleFileServer) DelDir(path string) error {
 	curPath := filepath.Join(s.rootPath, path)
 
+	fmt.Println("cur path :", curPath)
 	// 如果文件夹不在,不进行处理
 	if _, err := os.Stat(curPath); os.IsNotExist(err) {
-		return err
+		return nil
 	}
 
 	err := os.Remove(curPath)
