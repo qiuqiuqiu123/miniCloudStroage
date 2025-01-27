@@ -8,11 +8,7 @@ import (
 	"path/filepath"
 )
 
-/*
-*
-
-	总的根目录由rootPath指定,用户的根目录为rootPath/{user_id}/
-*/
+// SimpleFileServer 总的根目录由rootPath指定,用户的根目录为rootPath/{user_id}/
 type SimpleFileServer struct {
 	rootPath string
 }
